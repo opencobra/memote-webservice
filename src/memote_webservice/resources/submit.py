@@ -24,7 +24,8 @@ import redis
 import structlog
 from cobra.io import load_json_model, read_sbml_model, load_yaml_model
 from cobra.io.sbml3 import CobraSBMLError
-from flask_restplus import Resource, Namespace
+from flask import Blueprint
+from flask_restplus import Resource, Api
 from rq import Queue, Connection
 from werkzeug.datastructures import FileStorage
 
@@ -32,12 +33,13 @@ from memote_webservice.app import app
 
 LOGGER = structlog.get_logger(__name__)
 
-api = Namespace("submit", description="Submit models for testing.")
+submit = Blueprint("submit", __name__)
+api = Api(submit, description="Submit models for testing.")
 
 
 @api.route("/")
 class Submit(Resource):
-    """Provide endpoints for metabolic model testing."""
+    """Submit a metabolic model for testing."""
 
     JSON_TYPES = {
         "application/json",
@@ -69,17 +71,18 @@ class Submit(Resource):
         upload = self.upload_parser.parse_args(strict=True)["model"]
         model = self._load_model(upload)
         job_id = self._submit(model)
-        return {"result": job_id}, 202
+        return {"uuid": job_id}, 202
 
     def _submit(self, model):
         LOGGER.debug("Create connection to '%s'.", app.config["REDIS_URL"])
         with Connection(redis.from_url(app.config["REDIS_URL"])):
             LOGGER.debug("Using queue '%s'.", app.config["QUEUES"][0])
             queue = Queue(app.config["QUEUES"][0],
-                          default_timeout=app.config["QUEUE_TIMEOUTS"][0])
+                          default_timeout=app.config["QUEUE_TIMEOUT"][0])
             job = queue.enqueue(
                 "jobs.model_snapshot", args=(model,),
-                result_ttl=app.config["EXPIRATION_TIMES"][0])
+                ttl=app.config["JOB_TTL"][0],
+                result_ttl=app.config["RESULT_TTL"][0])
             LOGGER.debug(f"Successfully submitted job '{job.get_id()}'.")
         return job.get_id()
 

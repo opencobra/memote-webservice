@@ -17,6 +17,7 @@ python-json-logger = "*"
 webargs = "*"
 rq = "*"
 rq-dashboard = "*"
+cobra = "<0.13.0"
 memote = "*"
 
 [dev-packages]

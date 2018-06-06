@@ -39,9 +39,12 @@ class Default:
         self.CORS_ORIGINS = os.environ['ALLOWED_ORIGINS'].split(",")
         self.REDIS_URL = os.environ['REDIS_URL']
         self.QUEUES = ['default']
-        # An expiration time in seconds after which results will be deleted.
-        self.EXPIRATION_TIMES = [604800]  # 7 days
-        self.QUEUE_TIMEOUTS = [1800]
+        # Time after which a running job will be interrupted.
+        self.QUEUE_TIMEOUT = [1800]  # 30 min
+        # Time after which an enqueued job will be removed.
+        self.JOB_TTL = [86400]  # 1 day
+        # Time after which a successful result will be removed.
+        self.RESULT_TTL = [604800]  # 7 days
         self.SENTRY_DSN = os.environ.get('SENTRY_DSN')
         self.LOGGING = {
             'version': 1,

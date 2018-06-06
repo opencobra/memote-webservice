@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+cobra = "<0.13.0"
 memote = "*"
 rq = "*"
 

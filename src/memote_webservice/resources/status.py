@@ -17,41 +17,37 @@
 
 import redis
 import structlog
-from flask_restplus import Resource, Namespace
+from flask import Blueprint
+from flask_restplus import Resource, Api
 from rq import Queue, Connection
 
 from memote_webservice.app import app
 
 LOGGER = structlog.get_logger(__name__)
 
-api = Namespace("result", description="Retrieve status and results.")
+status = Blueprint("status", __name__)
+api = Api(status, description="Retrieve the result status.")
 
 
-@api.route("/<string:id>")
+@api.route("/<string:uuid>")
 @api.doc(params={"id": "A unique result identifier."}, responses={
     200: "Success",
     404: "Result not found"
 })
-class Result(Resource):
-    """Provide endpoints for metabolic model testing."""
+class Status(Resource):
+    """Query the queue for a particular result status."""
 
-    def get(self, id):
+    def get(self, uuid):
         LOGGER.debug("Create connection to '%s'.", app.config["REDIS_URL"])
         with Connection(redis.from_url(app.config["REDIS_URL"])):
             LOGGER.debug("Using queue '%s'.", app.config["QUEUES"][0])
             queue = Queue(app.config["QUEUES"][0])
-            job = queue.fetch_job(id)
+            job = queue.fetch_job(uuid)
         if job is None:
-            msg = f"Result {id} does not exist."
+            msg = f"Result {uuid} does not exist."
             LOGGER.error(msg)
             api.abort(404, msg)
-        if job.is_finished:
-            # Extract the SnapshotReport object's result attribute.
-            result = job.result.result
-        else:
-            result = None
         return {
-            "id": id,
-            "status": job.get_status(),
-            "result": result
+            "finished": job.is_finished,
+            "status": job.get_status()
         }
