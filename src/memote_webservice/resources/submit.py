@@ -47,13 +47,6 @@ class Submit(Resource):
         "application/xml",
         "text/xml"
     }
-    YAML_TYPES = {
-        "application/vnd.yaml",
-        "text/vnd.yaml",
-        "text/yaml",
-        "application/x-yaml",
-        "text/x-yaml"
-    }
     upload_parser = api.parser()
     upload_parser.add_argument(
         "model", location="files", type=FileStorage, required=True,
@@ -101,15 +94,11 @@ class Submit(Resource):
                     filename.endswith("xml") or filename.endswith("sbml"):
                 LOGGER.debug("Loading model from SBML.")
                 model = read_sbml_model(content)
-            elif file_storage.mimetype in self.YAML_TYPES or \
-                    filename.endswith("yaml") or filename.endswith("yml"):
-                LOGGER.debug("Loading model from YAML.")
-                model = load_yaml_model(content)
             else:
                 msg = f"'{file_storage.mimetype}' is an unhandled MIME type."
                 LOGGER.error(msg)
                 api.abort(415, msg, recognizedMIMETypes=list(chain(
-                    self.JSON_TYPES, self.XML_TYPES, self.YAML_TYPES)))
+                    self.JSON_TYPES, self.XML_TYPES)))
         except (CobraSBMLError, ValueError) as err:
             msg = "Failed to parse model."
             LOGGER.exception(msg)
