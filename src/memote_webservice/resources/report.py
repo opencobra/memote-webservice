@@ -17,11 +17,13 @@
 
 import redis
 import structlog
-from flask import Blueprint, make_response
-from flask_restplus import Resource, Api
+from flask import make_response
+from flask_restplus import Resource
 from rq import Queue, Connection
 
-from memote_webservice.app import app
+from memote_webservice.app import app, api
+
+__all__ = ("Report",)
 
 LOGGER = structlog.get_logger(__name__)
 
@@ -42,20 +44,19 @@ def output_html(report, code, headers=None):
     return resp
 
 
-report = Blueprint("report", __name__)
-api = Api(report, default_mediatype="application/json",
-          description="Retrieve model reports.")
-api.representations["application/json"] = output_json
-api.representations["text/html"] = output_html
-
-
-@api.route("/<string:uuid>")
+@api.route("/report/<string:uuid>")
 @api.doc(params={"uuid": "A unique result identifier."}, responses={
     200: "Success",
+    400: "Bad request",
     404: "Result not found"
 })
 class Report(Resource):
     """Provide endpoints for metabolic model testing."""
+
+    representations = {
+        "application/json": output_json,
+        "text/html": output_html
+    }
 
     def get(self, uuid):
         LOGGER.debug("Create connection to '%s'.", app.config["REDIS_URL"])

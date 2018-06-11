@@ -80,16 +80,11 @@ def init_app(application, interface):
                         level=logging.WARNING)
         sentry.init_app(application)
 
-    # Add routes and resources.
-    from memote_webservice.resources.submit import submit
-    application.register_blueprint(submit, url_prefix="/submit")
-    from memote_webservice.resources.status import status
-    application.register_blueprint(status, url_prefix="/status")
-    from memote_webservice.resources.report import report
-    application.register_blueprint(report, url_prefix="/report")
+    # Import resources.
+    import memote_webservice.resources
 
     # Apparently registering a blueprint takes care of routing.
-    # interface.init_app(application)
+    interface.init_app(application)
 
     # Add CORS information for all resources.
     CORS(application)

@@ -34,9 +34,10 @@ class Default:
         ``os.environ.__getitem__``.
         """
         self.DEBUG = True
+        self.SWAGGER_UI_DOC_EXPANSION = 'list'
         self.SECRET_KEY = os.urandom(24)
         self.BUNDLE_ERRORS = True
-        self.CORS_ORIGINS = os.environ['ALLOWED_ORIGINS'].split(",")
+        self.CORS_ORIGINS = os.environ['ALLOWED_ORIGINS'].split(',')
         self.REDIS_URL = os.environ['REDIS_URL']
         self.QUEUES = ['default']
         # Time after which a running job will be interrupted.

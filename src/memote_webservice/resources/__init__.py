@@ -14,3 +14,7 @@
 # limitations under the License.
 
 """Provide all resources, i.e., REST API endpoints."""
+
+from memote_webservice.resources.submit import *
+from memote_webservice.resources.status import *
+from memote_webservice.resources.report import *

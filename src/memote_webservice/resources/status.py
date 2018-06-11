@@ -17,20 +17,18 @@
 
 import redis
 import structlog
-from flask import Blueprint
-from flask_restplus import Resource, Api
+from flask_restplus import Resource
 from rq import Queue, Connection
 
-from memote_webservice.app import app
+from memote_webservice.app import app, api
+
+__all__ = ("Status",)
 
 LOGGER = structlog.get_logger(__name__)
 
-status = Blueprint("status", __name__)
-api = Api(status, description="Retrieve the result status.")
 
-
-@api.route("/<string:uuid>")
-@api.doc(params={"id": "A unique result identifier."}, responses={
+@api.route("/status/<string:uuid>")
+@api.doc(params={"uuid": "A unique result identifier."}, responses={
     200: "Success",
     404: "Result not found"
 })

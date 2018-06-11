@@ -24,20 +24,18 @@ import redis
 import structlog
 from cobra.io import load_json_model, read_sbml_model, load_yaml_model
 from cobra.io.sbml3 import CobraSBMLError
-from flask import Blueprint
-from flask_restplus import Resource, Api
+from flask_restplus import Resource
 from rq import Queue, Connection
 from werkzeug.datastructures import FileStorage
 
-from memote_webservice.app import app
+from memote_webservice.app import app, api
+
+__all__ = ("Submit",)
 
 LOGGER = structlog.get_logger(__name__)
 
-submit = Blueprint("submit", __name__)
-api = Api(submit, description="Submit models for testing.")
 
-
-@api.route("/")
+@api.route("/submit")
 class Submit(Resource):
     """Submit a metabolic model for testing."""
 
