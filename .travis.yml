@@ -9,53 +9,22 @@ services:
 
 env:
   global:
-    - IMAGE_TAG=travis-ci-test
-    - DEV_IMAGE=opencobra/memote-webservice:${IMAGE_TAG}
-    - PROD_IMAGE=opencobra/memote-webservice:travis-ci-prod
-  matrix:
-    - TARGET=test-travis
-    - TARGET=pipenv-check
-    - TARGET=flake8
-    - TARGET=isort
-    - TARGET=license
+    - IMAGE_REPO=opencobra/memote-webservice
+    - IMAGE_TAG=${TRAVIS_BRANCH}
 
-matrix:
-  fast_finish: true
-
-before_script:
-  - docker login -u=decaftravis -p=${DOCKER_PASSWORD}
-  - make network
+install:
+  - docker build -t ${IMAGE_REPO}:${TRAVIS_BRANCH} .
+  - make setup
 
 script:
-  - docker pull ${DEV_IMAGE}
-  - make ${TARGET}
-
-stages:
-  - build
-  - test
-  - name: deploy
-    if: branch = master
-
-jobs:
-  include:
-    - stage: build
-      script:
-        - docker build -t ${DEV_IMAGE} .
-        - docker build --build-arg PIPENV_FLAGS="--deploy" -t ${PROD_IMAGE} .
-        - docker push ${DEV_IMAGE}
-        - docker push ${PROD_IMAGE}
-    - stage: deploy
-      script:
-        - docker pull ${PROD_IMAGE}
-      deploy:
-        provider: script
-        script: ./scripts/push_to_hub.sh
+  - make flake8
+  - make isort
+  - make license
+  - make pipenv-check
+  - make test-travis
 
 notifications:
-  email: false
-  slack:
-    rooms:
-      - ${SLACK_ACCOUNT}:${SLACK_TOKEN}#${SLACK_CHANNEL}
-    on_success: never
-    on_failure: always
-    on_pull_requests: false
+  email:
+    on_success: change
+    on_failure: change
+    on_pull_request: false

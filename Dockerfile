@@ -12,8 +12,6 @@ ARG CWD="${HOME}/app"
 
 ENV PYTHONPATH="${CWD}/src"
 
-ARG PIPENV_FLAGS="--dev --deploy"
-
 RUN groupadd --system --gid "${GID}" "${APP_USER}" \
     && useradd --system --create-home --home-dir "${HOME}" \
         --uid "${UID}" --gid "${APP_USER}" "${APP_USER}"
@@ -30,8 +28,8 @@ RUN set -eux \
     && apt-get install --yes --only-upgrade openssl ca-certificates \
     && apt-get install --yes --no-install-recommends \
         g++ \
-    && pip install --upgrade pip setuptools wheel pipenv==11.10.0 \
-    && pipenv install --system ${PIPENV_FLAGS} \
+    && pip install --upgrade pip==9.0.3 setuptools wheel pipenv==11.10.0 \
+    && pipenv install --system --dev --deploy \
     && rm -rf /root/.cache/pip \
     && apt-get purge --yes g++ \
     && apt-get autoremove --yes \
