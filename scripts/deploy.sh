@@ -18,14 +18,11 @@ set -xeu
 
 if [ "${TRAVIS_BRANCH}" = "master" ]; then
   DEPLOYMENT=memote-webservice-production
-  WORKER_DEPLOYMENT=memote-worker-production
 elif [ "${TRAVIS_BRANCH}" = "devel" ]; then
   DEPLOYMENT=memote-webservice-staging
-  WORKER_DEPLOYMENT=memote-worker-staging
 else
   echo "Skipping deployment for branch ${TRAVIS_BRANCH}"
   exit 0
 fi
 
-kubectl set image deployment/${DEPLOYMENT} web=${IMAGE_REPO}:${TRAVIS_COMMIT::12}
-kubectl set image deployment/${WORKER_DEPLOYMENT} web=${WORKER_REPO}:${TRAVIS_COMMIT::12}
+kubectl set image deployment/${DEPLOYMENT} web=${IMAGE_REPO}:${TRAVIS_COMMIT::12} worker=web=${WORKER_REPO}:${TRAVIS_COMMIT::12}
