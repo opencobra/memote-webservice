@@ -16,8 +16,12 @@
 """Test expected functioning of the OpenAPI docs endpoints."""
 
 
-def test_docs(client):
-    """Expect the OpenAPI docs to be served at root."""
-    resp = client.get("/")
+def test_docs(app, client):
+    """Expect the OpenAPI docs to be served as HTML and JSON."""
+    resp = client.get(f"{app.config['SERVICE_URL']}/")
     assert resp.status_code == 200
     assert resp.content_type == "text/html; charset=utf-8"
+
+    resp = client.get(f"{app.config['SERVICE_URL']}/swagger.json")
+    assert resp.status_code == 200
+    assert resp.content_type == "application/json"
