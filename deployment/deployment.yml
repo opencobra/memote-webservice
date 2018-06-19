@@ -25,6 +25,8 @@ spec:
           value: production
         - name: FLASK_APP
           value: src/memote_webservice/wsgi.py
+        - name: API_PREFIX
+          value: /memote-webservice
         - name: SENTRY_DSN
           valueFrom:
             secretKeyRef:

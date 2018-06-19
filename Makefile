@@ -43,7 +43,7 @@ test-travis:
 	mkdir "$(shared)"
 	docker-compose run --rm -e ENVIRONMENT=testing -v "$(shared):$(shared)" \
 		web pytest --cov-report "xml:$(shared)/coverage.xml" \
-		--cov-report term --cov=src/memote_webservice
+		--cov-report "term:$(shared)/.coverage" --cov=src/memote_webservice
 	bash <(curl -s https://codecov.io/bash) -f "$(shared)/coverage.xml"
 
 ## Check for known vulnerabilities in python dependencies.
