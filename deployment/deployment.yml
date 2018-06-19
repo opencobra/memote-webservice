@@ -27,6 +27,10 @@ spec:
           value: src/memote_webservice/wsgi.py
         - name: API_PREFIX
           value: /memote-webservice
+        - name: ALLOWED_ORIGINS
+          value: memote.dd-decaf.eu,*
+        - name: REDIS_URL
+          value: redis://localhost:6379/0
         - name: SENTRY_DSN
           valueFrom:
             secretKeyRef:
@@ -37,8 +41,6 @@ spec:
             secretKeyRef:
               name: memote-webservice
               key: SECRET_KEY
-        - name: REDIS_URL
-          value: redis://localhost:6379/0
         command: ["gunicorn", "-c", "gunicorn.py", "memote_webservice.wsgi:app"]
         resources:
           requests:
