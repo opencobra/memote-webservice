@@ -1,30 +1,47 @@
 sudo: required
 language: minimal
-
 git:
   depth: 2
-
 services:
-  - docker
-
+- docker
+branches:
+  only:
+  - master
+  - devel
 env:
   global:
-    - IMAGE_REPO=opencobra/memote-webservice
-    - IMAGE_TAG=${TRAVIS_BRANCH}
-
+  - IMAGE_REPO=gcr.io/dd-decaf-cfbf6/memote-webservice
+  - WORKER_REPO=gcr.io/dd-decaf-cfbf6/memote-worker
+  - IMAGE_TAG=${TRAVIS_BRANCH}
+before_install:
+- echo ${DOCKER_PASSWORD} | docker login -u=decaftravis --password-stdin
 install:
-  - docker build -t ${IMAGE_REPO}:${TRAVIS_BRANCH} .
-  - make setup
-
+- docker build -t ${IMAGE_REPO}:${TRAVIS_COMMIT::12} -t ${IMAGE_REPO}:${TRAVIS_BRANCH} .
+- docker build -t ${WORKER_REPO}:${TRAVIS_COMMIT::12} -t ${WORKER_REPO}:${TRAVIS_BRANCH} worker/
+- make setup
 script:
-  - make flake8
-  - make isort
-  - make license
-  - make pipenv-check
-  - make test-travis
-
+- make flake8
+- make isort
+- make license
+- make pipenv-check
+- make test-travis
+before_deploy:
+- "./scripts/install_gcloud.sh"
+- "./scripts/install_kubectl.sh"
+- docker push ${IMAGE_REPO}:${TRAVIS_COMMIT::12}
+- docker push ${IMAGE_REPO}:${TRAVIS_BRANCH}
+- docker push ${WORKER_REPO}:${TRAVIS_COMMIT::12}
+- docker push ${WORKER_REPO}:${TRAVIS_BRANCH}
+deploy:
+  provider: script
+  script: "./scripts/deploy.sh"
+  on:
+    all_branches: true
 notifications:
-  email:
+  email: false
+  slack:
     on_success: change
     on_failure: change
-    on_pull_request: false
+    on_pull_requests: false
+    rooms:
+      secure: uBeBfJGWoK9ixScW2iHO+6lte6xwDaySDjO1I8CIZynzFDRcVhpeKlcncqB4B+wxAQ9VQIFrx4UzYD8Pfa4iDNQasrv4Xq34cGmoHJa3yTvQKUyqryJB5r346XbNIpZukOa8t68yt15fmuUnlw3j/BE0JTMIjaoFhPb3rFHqYyxQ0yidZm7Vkwa8CrgHARf3K34LbhTFZiK/tyyins55lyMo6rOsnV2B3pn1BD86pTbddAfTII0yDTdThLx+ETBATPJDusZw0Z5u/rbp+CQa8hXt5ziwnb62mrc1DZ3xVUQmnMD8kxZOPTk9CxpCloqcUuOxe9I0L75G2eLVneIKd2zfoeRlL6f5rlT0vEcYAdhti7tG3DCMmcd5Ut3r/DoYgUCNgiG00GnkmzvVoVX5hm5zAStMr9R4+YELKUadwJi11X2SjazIb7N/YvQEXd240MOFHbpmSbMvbCxdS+M2I7B7XPRtpOf/nzH3LJYXDOXQMFOYG2FpTaoThUwy0B4UjOfyeF9OnULH/X/s5BZ4gAGa0KUOMQqpsYqjCtfYQIJ/jZ6VqRdyVlBhuDXlP6zu/y6Qen9z+bI7Yt3o4Bocip20KCTr7fqERz/06RFsq2UR6rqpgZKP3NLyQ4XPq+KLF4qpWHp3ICr9tQgksv4whswmzQqcAtEN8qjBecO09jU=

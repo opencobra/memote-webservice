@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memote-webservice-production
+spec:
+  selector:
+    matchLabels:
+      app: memote-webservice
+      env: production
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: memote-webservice
+        env: production
+    spec:
+      containers:
+      - name: web
+        image: gcr.io/dd-decaf-cfbf6/memote-webservice:master
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        env:
+        - name: ENVIRONMENT
+          value: production
+        - name: FLASK_APP
+          value: src/memote_webservice/wsgi.py
+        - name: SENTRY_DSN
+          valueFrom:
+            secretKeyRef:
+              name: memote-webservice
+              key: SENTRY_DSN
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: memote-webservice
+              key: SECRET_KEY
+        - name: REDIS_URL
+          value: redis://localhost:6379/0
+        command: ["gunicorn", "-c", "gunicorn.py", "memote_webservice.wsgi:app"]
+        resources:
+          requests:
+            cpu: "5m"
+          limits:
+            cpu: "100m"
+      - name: worker
+        image: gcr.io/dd-decaf-cfbf6/memote-worker:master
+        imagePullPolicy: Always
+        env:
+        - name: REDIS_URL
+          value: redis://localhost:6379/0
+        command: ["python", "worker.py"]
+        resources:
+          requests:
+            cpu: "10m"
+          limits:
+            cpu: "100m"
+      - name: cache
+        image: redis:4.0-alpine
+        resources:
+          requests:
+            cpu: "5m"
+          limits:
+            cpu: "100m"
