@@ -34,7 +34,7 @@ class Default:
         ``os.environ.__getitem__``.
         """
         self.DEBUG = True
-        self.APPLICATION_ROOT = os.environ.get("API_PREFIX", "/")
+        self.SERVICE_URL = os.environ.get("SERVICE_URL", "/")
         self.SWAGGER_UI_DOC_EXPANSION = 'list'
         self.SECRET_KEY = os.urandom(24)
         self.BUNDLE_ERRORS = True

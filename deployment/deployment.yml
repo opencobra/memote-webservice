@@ -25,7 +25,7 @@ spec:
           value: production
         - name: FLASK_APP
           value: src/memote_webservice/wsgi.py
-        - name: API_PREFIX
+        - name: SERVICE_URL
           value: /memote-webservice
         - name: ALLOWED_ORIGINS
           value: memote.dd-decaf.eu,*

@@ -33,7 +33,7 @@ app = Flask(__name__)
 api = Api(
     title="Memote Webservice",
     version="0.1.0",
-    description="Provide a REST API for testing metabolic models with memote.",
+    description="Provide a REST API for testing metabolic models with memote."
 )
 redis_store = FlaskRedis()
 
@@ -83,6 +83,8 @@ def init_app(application, interface):
     # Import resources.
     import memote_webservice.resources
 
+    interface.prefix = application.config['SERVICE_URL']
+    interface._doc = application.config['SERVICE_URL'] + '/'
     # Apparently registering a blueprint takes care of routing.
     interface.init_app(application)
 
