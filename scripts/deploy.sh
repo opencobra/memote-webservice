@@ -25,4 +25,4 @@ else
   exit 0
 fi
 
-kubectl set image deployment/${DEPLOYMENT} web=${IMAGE_REPO}:${TRAVIS_COMMIT::12} worker=web=${WORKER_REPO}:${TRAVIS_COMMIT::12}
+kubectl set image deployment/${DEPLOYMENT} web=${IMAGE_REPO}:${TRAVIS_COMMIT::12} worker=${WORKER_REPO}:${TRAVIS_COMMIT::12}
