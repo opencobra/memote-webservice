@@ -20,10 +20,10 @@ install:
 - docker build -t ${WORKER_REPO}:${TRAVIS_COMMIT::12} -t ${WORKER_REPO}:${TRAVIS_BRANCH} worker/
 - make setup
 script:
-#- make flake8
-#- make isort
-#- make license
-#- make pipenv-check
+- make flake8
+- make isort
+- make license
+- make pipenv-check
 - make test-travis
 before_deploy:
 - "./scripts/install_gcloud.sh"
