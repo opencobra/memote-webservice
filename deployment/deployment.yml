@@ -44,7 +44,7 @@ spec:
         command: ["gunicorn", "-c", "gunicorn.py", "memote_webservice.wsgi:app"]
         resources:
           requests:
-            cpu: "5m"
+            cpu: "10m"
           limits:
             cpu: "100m"
       - name: worker
@@ -58,11 +58,11 @@ spec:
           requests:
             cpu: "10m"
           limits:
-            cpu: "100m"
+            cpu: "1000m"
       - name: cache
         image: redis:4.0-alpine
         resources:
           requests:
-            cpu: "5m"
+            cpu: "10m"
           limits:
             cpu: "100m"
