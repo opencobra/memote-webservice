@@ -26,6 +26,7 @@ from flask_redis import FlaskRedis
 from flask_restplus import Api
 from pythonjsonlogger import jsonlogger
 from raven.contrib.flask import Sentry
+from werkzeug.contrib.fixers import ProxyFix
 
 
 LOGGER = structlog.get_logger(__name__)
@@ -91,5 +92,10 @@ def init_app(application, interface):
 
     # Add Redis caching.
     redis_store.init_app(application)
+
+    # Please keep in mind that it is a security issue to use such a middleware
+    # in a non-proxy setup because it will blindly trust the incoming headers
+    # which might be forged by malicious clients.
+    application.wsgi_app = ProxyFix(application.wsgi_app)
 
     LOGGER.debug("Successfully initialized the app.")
