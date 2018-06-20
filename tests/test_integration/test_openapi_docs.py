@@ -15,13 +15,20 @@
 
 """Test expected functioning of the OpenAPI docs endpoints."""
 
+from urllib.parse import urljoin
 
-def test_docs(app, client):
-    """Expect the OpenAPI docs to be served as HTML and JSON."""
-    resp = client.get(f"{app.config['SERVICE_URL']}/")
+
+def test_swagger_docs(app, client):
+    """Expect the OpenAPI docs to be served as HTML."""
+    endpoint = urljoin(app.config["SCRIPT_NAME"], "/")
+    resp = client.get(endpoint)
     assert resp.status_code == 200
     assert resp.content_type == "text/html; charset=utf-8"
 
-    resp = client.get(f"{app.config['SERVICE_URL']}/swagger.json")
+
+def test_swagger_json(app, client):
+    """Expect the OpenAPI docs to be served as JSON."""
+    endpoint = urljoin(app.config["SCRIPT_NAME"], "/swagger.json")
+    resp = client.get(endpoint)
     assert resp.status_code == 200
     assert resp.content_type == "application/json"

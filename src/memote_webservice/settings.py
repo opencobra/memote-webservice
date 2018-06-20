@@ -17,7 +17,6 @@
 
 import os
 
-import structlog
 
 __all__ = ("Development", "Testing", "Production")
 
@@ -34,7 +33,7 @@ class Default:
         ``os.environ.__getitem__``.
         """
         self.DEBUG = True
-        self.SERVICE_URL = os.environ.get("SERVICE_URL", "/")
+        self.SCRIPT_NAME = os.environ.get("SCRIPT_NAME", "/")
         self.SWAGGER_UI_DOC_EXPANSION = 'list'
         self.SECRET_KEY = os.urandom(24)
         self.BUNDLE_ERRORS = True
@@ -89,6 +88,7 @@ class Testing(Default):
     """Testing environment configuration."""
 
     def __init__(self):
+        """Initialize the testing environment configuration."""
         super().__init__()
         self.TESTING = True
 
@@ -106,4 +106,5 @@ class Production(Default):
         super().__init__()
         self.DEBUG = False
         self.SECRET_KEY = os.environ['SECRET_KEY']
+        self.SCRIPT_NAME = os.environ["SCRIPT_NAME"]
         self.LOGGING['root']['level'] = 'INFO'

@@ -17,7 +17,7 @@ services:
     environment:
       - ENVIRONMENT=${ENVIRONMENT:-development}
       - FLASK_APP=src/memote_webservice/wsgi.py
-      - SERVICE_URL=/memote-webservice
+      - SCRIPT_NAME=/memote-webservice
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:*}
       - SENTRY_DSN=${SENTRY_DSN}
       - REDIS_URL=redis://cache:6379/0

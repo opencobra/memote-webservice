@@ -27,6 +27,7 @@ from flask_restplus import Api
 from pythonjsonlogger import jsonlogger
 from raven.contrib.flask import Sentry
 
+
 LOGGER = structlog.get_logger(__name__)
 
 app = Flask(__name__)
@@ -51,7 +52,7 @@ def init_app(application, interface):
         application.config.from_object(Development())
 
     # Configure logging
-    logging.config.dictConfig(application.config['LOGGING'])
+    logging.config.dictConfig(application.config["LOGGING"])
     root_logger = logging.getLogger()
     for handler in root_logger.handlers:
         handler.setFormatter(jsonlogger.JsonFormatter())
@@ -75,17 +76,14 @@ def init_app(application, interface):
     )
 
     # Configure Sentry
-    if application.config['SENTRY_DSN']:
-        sentry = Sentry(dsn=application.config['SENTRY_DSN'], logging=True,
+    if application.config["SENTRY_DSN"]:
+        sentry = Sentry(dsn=application.config["SENTRY_DSN"], logging=True,
                         level=logging.WARNING)
         sentry.init_app(application)
 
     # Import resources.
-    import memote_webservice.resources
+    import memote_webservice.resources  # noqa: F401
 
-    interface.prefix = application.config['SERVICE_URL']
-    interface._doc = application.config['SERVICE_URL'] + '/'
-    # Apparently registering a blueprint takes care of routing.
     interface.init_app(application)
 
     # Add CORS information for all resources.

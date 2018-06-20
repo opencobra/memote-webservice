@@ -22,13 +22,14 @@ from itertools import chain
 
 import redis
 import structlog
-from cobra.io import load_json_model, read_sbml_model, load_yaml_model
+from cobra.io import load_json_model, read_sbml_model
 from cobra.io.sbml3 import CobraSBMLError
 from flask_restplus import Resource
-from rq import Queue, Connection
+from rq import Connection, Queue
 from werkzeug.datastructures import FileStorage
 
-from memote_webservice.app import app, api
+from memote_webservice.app import api, app
+
 
 __all__ = ("Submit",)
 
