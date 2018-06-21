@@ -35,6 +35,8 @@ class Default:
         self.DEBUG = True
         self.SCRIPT_NAME = os.environ.get("SCRIPT_NAME", "/")
         self.SWAGGER_UI_DOC_EXPANSION = 'list'
+        self.MAX_CONTENT_LENGTH = os.environ.get(
+            "MAX_CONTENT_LENGTH", 10 * 1024 * 1024)  # 10 MB default limit.
         self.SECRET_KEY = os.urandom(24)
         self.BUNDLE_ERRORS = True
         self.CORS_ORIGINS = os.environ['ALLOWED_ORIGINS'].split(',')
