@@ -35,8 +35,9 @@ class Default:
         self.DEBUG = True
         self.SCRIPT_NAME = os.environ.get("SCRIPT_NAME", "/")
         self.SWAGGER_UI_DOC_EXPANSION = 'list'
+        # 25 MB default limit (size of Recon3D).
         self.MAX_CONTENT_LENGTH = int(os.environ.get(
-            "MAX_CONTENT_LENGTH", 10 * 1024 * 1024))  # 10 MB default limit.
+            "MAX_CONTENT_LENGTH", 25 * 1024 * 1024))
         self.SECRET_KEY = os.urandom(24)
         self.BUNDLE_ERRORS = True
         self.CORS_ORIGINS = os.environ['ALLOWED_ORIGINS'].split(',')

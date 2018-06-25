@@ -2,6 +2,10 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: memote-webservice
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "25m"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "120"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
 spec:
   tls:
   - hosts:
