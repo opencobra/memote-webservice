@@ -33,7 +33,6 @@ class Default:
         ``os.environ.__getitem__``.
         """
         self.DEBUG = True
-        self.SCRIPT_NAME = os.environ.get("SCRIPT_NAME", "/")
         self.SWAGGER_UI_DOC_EXPANSION = 'list'
         # 25 MB default limit (size of Recon3D).
         self.MAX_CONTENT_LENGTH = int(os.environ.get(
@@ -109,5 +108,4 @@ class Production(Default):
         super().__init__()
         self.DEBUG = False
         self.SECRET_KEY = os.environ['SECRET_KEY']
-        self.SCRIPT_NAME = os.environ["SCRIPT_NAME"]
         self.LOGGING['root']['level'] = 'INFO'

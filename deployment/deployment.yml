@@ -28,7 +28,7 @@ spec:
         - name: SCRIPT_NAME
           value: /memote-webservice
         - name: ALLOWED_ORIGINS
-          value: memote.dd-decaf.eu,*
+          value: https://memote.dd-decaf.eu,*
         - name: MAX_CONTENT_LENGTH
           value: "26214400"  # 25 MB is the size of Recon3D.
         - name: REDIS_URL
