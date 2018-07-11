@@ -24,7 +24,6 @@ import redis
 import structlog
 from cobra.io import load_json_model, read_sbml_model
 from cobra.io.sbml3 import CobraSBMLError
-from flask import abort
 from flask_restplus import Resource
 from rq import Connection, Queue
 from werkzeug.datastructures import FileStorage
@@ -86,7 +85,7 @@ class Submit(Resource):
         except IOError as err:
             msg = "Failed to decompress file."
             LOGGER.exception(msg)
-            abort(400, msg, error=str(err))
+            api.abort(400, msg, error=str(err))
         try:
             if file_storage.mimetype in self.JSON_TYPES or \
                     filename.endswith("json"):
@@ -99,12 +98,12 @@ class Submit(Resource):
             else:
                 msg = f"'{file_storage.mimetype}' is an unhandled MIME type."
                 LOGGER.error(msg)
-                abort(415, msg, recognizedMIMETypes=list(chain(
+                api.abort(415, msg, recognizedMIMETypes=list(chain(
                     self.JSON_TYPES, self.XML_TYPES)))
         except (CobraSBMLError, ValueError) as err:
             msg = "Failed to parse model."
             LOGGER.exception(msg)
-            abort(400, msg, error=str(err))
+            api.abort(400, msg, error=str(err))
         finally:
             content.close()
             file_storage.close()

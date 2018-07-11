@@ -17,7 +17,7 @@
 
 import redis
 import structlog
-from flask import abort, make_response
+from flask import make_response
 from flask_restplus import Resource
 from rq import Connection, Queue
 
@@ -70,13 +70,13 @@ class Report(Resource):
             job = queue.fetch_job(uuid)
         if job is None:
             msg = f"Result {uuid} does not exist."
-            LOGGER.error(msg)
-            abort(404, msg)
+            LOGGER.info(msg)
+            api.abort(404, msg)
         if job.is_finished:
             # Extract the SnapshotReport object's result attribute.
             report = job.result
         else:
             msg = f"Result {uuid} is not yet finished."
-            LOGGER.error(msg)
-            abort(400, msg)
+            LOGGER.info(msg)
+            api.abort(400, msg)
         return report

@@ -17,7 +17,6 @@
 
 import redis
 import structlog
-from flask import abort
 from flask_restplus import Resource
 from rq import Connection, Queue
 
@@ -46,8 +45,8 @@ class Status(Resource):
             job = queue.fetch_job(uuid)
         if job is None:
             msg = f"Result {uuid} does not exist."
-            LOGGER.error(msg)
-            abort(404, msg)
+            LOGGER.info(msg)
+            api.abort(404, msg)
         return {
             "finished": job.is_finished,
             "status": job.get_status()
