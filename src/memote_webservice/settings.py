@@ -17,7 +17,8 @@
 
 import os
 
-import structlog
+import werkzeug.exceptions
+
 
 __all__ = ("Development", "Testing", "Production")
 
@@ -35,6 +36,9 @@ class Default:
         """
         self.DEBUG = True
         self.SWAGGER_UI_DOC_EXPANSION = 'list'
+        # 25 MB default limit (size of Recon3D).
+        self.MAX_CONTENT_LENGTH = int(os.environ.get(
+            "MAX_CONTENT_LENGTH", 25 * 1024 * 1024))
         self.SECRET_KEY = os.urandom(24)
         self.BUNDLE_ERRORS = True
         self.CORS_ORIGINS = os.environ['ALLOWED_ORIGINS'].split(',')
@@ -47,6 +51,15 @@ class Default:
         # Time after which a successful result will be removed.
         self.RESULT_TTL = [604800]  # 7 days
         self.SENTRY_DSN = os.environ.get('SENTRY_DSN')
+        self.SENTRY_CONFIG = {
+            'ignore_exceptions': [
+                werkzeug.exceptions.BadRequest,
+                werkzeug.exceptions.Unauthorized,
+                werkzeug.exceptions.Forbidden,
+                werkzeug.exceptions.NotFound,
+                werkzeug.exceptions.MethodNotAllowed,
+            ]
+        }
         self.LOGGING = {
             'version': 1,
             'disable_existing_loggers': False,
@@ -88,6 +101,7 @@ class Testing(Default):
     """Testing environment configuration."""
 
     def __init__(self):
+        """Initialize the testing environment configuration."""
         super().__init__()
         self.TESTING = True
 

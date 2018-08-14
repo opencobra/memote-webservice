@@ -15,6 +15,7 @@ raven = {version = "*", extras = ["flask"]}
 structlog = "*"
 python-json-logger = "*"
 webargs = "*"
+werkzeug = "*"
 rq = "*"
 rq-dashboard = "*"
 cobra = "<0.13.0"

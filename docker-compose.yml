@@ -1,7 +1,6 @@
 version: "3.1"
 services:
   web:
-    user: kaa
     build:
       context: .
       dockerfile: Dockerfile
@@ -18,7 +17,8 @@ services:
     environment:
       - ENVIRONMENT=${ENVIRONMENT:-development}
       - FLASK_APP=src/memote_webservice/wsgi.py
-      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:*}
+      - SCRIPT_NAME=/memote-webservice
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-*}
       - SENTRY_DSN=${SENTRY_DSN}
       - REDIS_URL=redis://cache:6379/0
     depends_on:

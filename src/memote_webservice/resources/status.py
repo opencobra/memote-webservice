@@ -18,9 +18,10 @@
 import redis
 import structlog
 from flask_restplus import Resource
-from rq import Queue, Connection
+from rq import Connection, Queue
 
-from memote_webservice.app import app, api
+from memote_webservice.app import api, app
+
 
 __all__ = ("Status",)
 
@@ -36,6 +37,7 @@ class Status(Resource):
     """Query the queue for a particular result status."""
 
     def get(self, uuid):
+        """Return queue information about a job."""
         LOGGER.debug("Create connection to '%s'.", app.config["REDIS_URL"])
         with Connection(redis.from_url(app.config["REDIS_URL"])):
             LOGGER.debug("Using queue '%s'.", app.config["QUEUES"][0])
@@ -43,7 +45,7 @@ class Status(Resource):
             job = queue.fetch_job(uuid)
         if job is None:
             msg = f"Result {uuid} does not exist."
-            LOGGER.error(msg)
+            LOGGER.info(msg)
             api.abort(404, msg)
         return {
             "finished": job.is_finished,

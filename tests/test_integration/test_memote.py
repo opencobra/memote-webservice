@@ -16,23 +16,28 @@
 """Ensure that memote returns a well-defined JSON snapshot result."""
 
 import json
-from os.path import join, dirname
+from os.path import dirname, join, pardir
 
 import memote
 import pytest
 from cobra.io import read_sbml_model
 from jsonschema import Draft4Validator
 
-DATA_PATH = join(dirname(__file__), "..", "data")
+
+DATA_PATH = join(dirname(__file__), pardir, "data")
 
 
 @pytest.fixture(scope="module", params=[
     join(DATA_PATH, "EcoliCore.xml"),
 ])
 def model(request):
-    return read_sbml_model(request.param)
+    """Provide a model for testing that automatically resets."""
+    model = read_sbml_model(request.param)
+    with model:
+        yield model
 
 
+@pytest.mark.xfail(strict=True, reason="Schema is not up-to-date.")
 def test_snapshot(model):
     """Expect the OpenAPI docs to be served at root."""
     with open(join(DATA_PATH, "store.json")) as file_handle:

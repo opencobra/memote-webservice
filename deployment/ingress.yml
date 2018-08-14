@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: memote-webservice
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "25m"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+spec:
+  tls:
+  - hosts:
+    - api.dd-decaf.eu
+    secretName: decaf-tls
+  rules:
+  - host: api.dd-decaf.eu
+    http:
+      paths:
+      - path: /memote-webservice
+        backend:
+          serviceName: memote-webservice-production
+          servicePort: 80

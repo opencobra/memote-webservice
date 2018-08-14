@@ -19,9 +19,10 @@ import redis
 import structlog
 from flask import make_response
 from flask_restplus import Resource
-from rq import Queue, Connection
+from rq import Connection, Queue
 
-from memote_webservice.app import app, api
+from memote_webservice.app import api, app
+
 
 __all__ = ("Report",)
 
@@ -29,6 +30,7 @@ LOGGER = structlog.get_logger(__name__)
 
 
 def output_json(report, code, headers=None):
+    """Convert a memote report to JSON."""
     LOGGER.debug("Converting to JSON.")
     resp = make_response(report.render_json(), code)
     if headers is not None:
@@ -37,6 +39,7 @@ def output_json(report, code, headers=None):
 
 
 def output_html(report, code, headers=None):
+    """Convert a memote report to HTML."""
     LOGGER.debug("Converting to HTML.")
     resp = make_response(report.render_html(), code)
     if headers is not None:
@@ -59,6 +62,7 @@ class Report(Resource):
     }
 
     def get(self, uuid):
+        """Return a snapshot report as JSON or HTML based on Accept headers."""
         LOGGER.debug("Create connection to '%s'.", app.config["REDIS_URL"])
         with Connection(redis.from_url(app.config["REDIS_URL"])):
             LOGGER.debug("Using queue '%s'.", app.config["QUEUES"][0])
@@ -66,13 +70,13 @@ class Report(Resource):
             job = queue.fetch_job(uuid)
         if job is None:
             msg = f"Result {uuid} does not exist."
-            LOGGER.error(msg)
+            LOGGER.info(msg)
             api.abort(404, msg)
         if job.is_finished:
             # Extract the SnapshotReport object's result attribute.
             report = job.result
         else:
             msg = f"Result {uuid} is not yet finished."
-            LOGGER.error(msg)
+            LOGGER.info(msg)
             api.abort(400, msg)
         return report

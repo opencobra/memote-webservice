@@ -26,6 +26,8 @@ from flask_redis import FlaskRedis
 from flask_restplus import Api
 from pythonjsonlogger import jsonlogger
 from raven.contrib.flask import Sentry
+from werkzeug.contrib.fixers import ProxyFix
+
 
 LOGGER = structlog.get_logger(__name__)
 
@@ -33,7 +35,7 @@ app = Flask(__name__)
 api = Api(
     title="Memote Webservice",
     version="0.1.0",
-    description="Provide a REST API for testing metabolic models with memote.",
+    description="Provide a REST API for testing metabolic models with memote."
 )
 redis_store = FlaskRedis()
 
@@ -51,7 +53,7 @@ def init_app(application, interface):
         application.config.from_object(Development())
 
     # Configure logging
-    logging.config.dictConfig(application.config['LOGGING'])
+    logging.config.dictConfig(application.config["LOGGING"])
     root_logger = logging.getLogger()
     for handler in root_logger.handlers:
         handler.setFormatter(jsonlogger.JsonFormatter())
@@ -75,15 +77,14 @@ def init_app(application, interface):
     )
 
     # Configure Sentry
-    if application.config['SENTRY_DSN']:
-        sentry = Sentry(dsn=application.config['SENTRY_DSN'], logging=True,
-                        level=logging.WARNING)
+    if application.config["SENTRY_DSN"]:
+        sentry = Sentry(dsn=application.config["SENTRY_DSN"], logging=True,
+                        level=logging.ERROR)
         sentry.init_app(application)
 
     # Import resources.
-    import memote_webservice.resources
+    import memote_webservice.resources  # noqa: F401
 
-    # Apparently registering a blueprint takes care of routing.
     interface.init_app(application)
 
     # Add CORS information for all resources.
@@ -91,5 +92,10 @@ def init_app(application, interface):
 
     # Add Redis caching.
     redis_store.init_app(application)
+
+    # Please keep in mind that it is a security issue to use such a middleware
+    # in a non-proxy setup because it will blindly trust the incoming headers
+    # which might be forged by malicious clients.
+    application.wsgi_app = ProxyFix(application.wsgi_app)
 
     LOGGER.debug("Successfully initialized the app.")

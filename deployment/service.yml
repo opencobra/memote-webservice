@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: memote-webservice-production
+spec:
+  selector:
+    app: memote-webservice
+    env: production
+  ports:
+  - name: web
+    protocol: TCP
+    port: 80
+    targetPort: 8000

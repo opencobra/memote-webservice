@@ -21,7 +21,7 @@ _config = os.environ["ENVIRONMENT"]
 
 bind = "0.0.0.0:8000"
 worker_class = "gevent"
-timeout = 20
+timeout = 600  # Allow upload of large models. Also set in ingress.yml.
 accesslog = "-"
 access_log_format = (
     '{'
