@@ -16,8 +16,8 @@ env:
 before_install:
 - echo ${DOCKER_PASSWORD} | docker login -u=decaftravis --password-stdin
 install:
-- docker build -t ${IMAGE_REPO}:${TRAVIS_COMMIT::12} -t ${IMAGE_REPO}:${TRAVIS_BRANCH} .
-- docker build -t ${WORKER_REPO}:${TRAVIS_COMMIT::12} -t ${WORKER_REPO}:${TRAVIS_BRANCH} worker/
+- docker build -t ${IMAGE_REPO}:${TRAVIS_COMMIT::12}-${TRAVIS_BUILD_NUMBER} -t ${IMAGE_REPO}:${TRAVIS_BRANCH} .
+- docker build -t ${WORKER_REPO}:${TRAVIS_COMMIT::12}-${TRAVIS_BUILD_NUMBER} -t ${WORKER_REPO}:${TRAVIS_BRANCH} worker/
 - make setup
 script:
 - make flake8
@@ -28,9 +28,9 @@ script:
 before_deploy:
 - "./scripts/install_gcloud.sh"
 - "./scripts/install_kubectl.sh"
-- docker push ${IMAGE_REPO}:${TRAVIS_COMMIT::12}
+- docker push ${IMAGE_REPO}:${TRAVIS_COMMIT::12}-${TRAVIS_BUILD_NUMBER}
 - docker push ${IMAGE_REPO}:${TRAVIS_BRANCH}
-- docker push ${WORKER_REPO}:${TRAVIS_COMMIT::12}
+- docker push ${WORKER_REPO}:${TRAVIS_COMMIT::12}-${TRAVIS_BUILD_NUMBER}
 - docker push ${WORKER_REPO}:${TRAVIS_BRANCH}
 deploy:
   provider: script
