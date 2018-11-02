@@ -30,4 +30,7 @@ celery_app.conf.update(
     task_time_limit=1800,  # 30 min
     # Time after which a successful result will be removed.
     result_expires=604800,  # 7 days
+    task_serializer='pickle',
+    result_serializer='pickle',
+    accept_content=['pickle'],
 )
