@@ -15,12 +15,12 @@
 
 """Provide a resource for retrieving test results."""
 
-import redis
+from celery.result import AsyncResult
 import structlog
 from flask_restplus import Resource
-from rq import Connection, Queue
 
 from memote_webservice.app import api, app
+from memote_webservice.celery import celery_app
 
 
 __all__ = ("Status",)
@@ -37,17 +37,13 @@ class Status(Resource):
     """Query the queue for a particular result status."""
 
     def get(self, uuid):
-        """Return queue information about a job."""
-        LOGGER.debug("Create connection to '%s'.", app.config["REDIS_URL"])
-        with Connection(redis.from_url(app.config["REDIS_URL"])):
-            LOGGER.debug("Using queue '%s'.", app.config["QUEUES"][0])
-            queue = Queue(app.config["QUEUES"][0])
-            job = queue.fetch_job(uuid)
-        if job is None:
+        """Return queue information about a task."""
+        result = AsyncResult(id=uuid, app=celery_app)
+        if result.state == 'PENDING':
             msg = f"Result {uuid} does not exist."
             LOGGER.info(msg)
             api.abort(404, msg)
         return {
-            "finished": job.is_finished,
-            "status": job.get_status()
+            "finished": result.ready(),
+            "status": result.state,
         }

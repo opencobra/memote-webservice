@@ -13,13 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Define individual jobs."""
+"""Instantiate the celery app shared by the app and workers."""
 
-import memote
+import os
+
+from celery import Celery
 
 
-def model_snapshot(model):
-    _, result = memote.test_model(model, results=True,
-                                  pytest_args=["--tb", "no"])
-    config = memote.ReportConfiguration.load()
-    return memote.SnapshotReport(result=result, configuration=config)
+celery_app = Celery(
+    broker=os.environ['REDIS_URL'],
+    backend=os.environ['REDIS_URL'],
+)
+
+celery_app.conf.update(
+    # Time after which a running job will be interrupted.
+    task_time_limit=1800,  # 30 min
+    # Time after which a successful result will be removed.
+    result_expires=604800,  # 7 days
+)

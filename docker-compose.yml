@@ -36,10 +36,11 @@ services:
     volumes:
       - ".:/home/kaa/app"
     environment:
+      - ENVIRONMENT=${ENVIRONMENT:-development}
       - REDIS_URL=redis://cache:6379/0
     depends_on:
       - cache
-    command: python src/memote_webservice/worker.py
+    command: celery -A memote_webservice.tasks worker --loglevel=info
   dashboard:
     build:
       context: dashboard/

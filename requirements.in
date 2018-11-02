@@ -8,7 +8,7 @@ structlog
 python-json-logger
 webargs
 werkzeug
-rq
-rq-dashboard
+celery[redis]
+flower
 cobra
 memote

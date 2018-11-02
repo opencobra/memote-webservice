@@ -13,16 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Define workers that chow through the queue."""
+"""Define individual jobs."""
 
-import os
-import sys
+import memote
 
-import jobs  # Pre-load job functions and libraries for performance.
-import redis
-from rq import Connection, Worker
+from .celery import celery_app
 
 
-with Connection(redis.from_url(os.environ["REDIS_URL"])):
-    worker = Worker(sys.argv[1:] or ["default"])
-    worker.work()
+@celery_app.task
+def model_snapshot(model):
+    _, result = memote.test_model(model, results=True,
+                                  pytest_args=["--tb", "no"])
+    config = memote.ReportConfiguration.load()
+    return memote.SnapshotReport(result=result, configuration=config)

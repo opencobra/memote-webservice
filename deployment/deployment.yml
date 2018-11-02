@@ -55,7 +55,7 @@ spec:
         env:
         - name: REDIS_URL
           value: redis://localhost:6379/0
-        command: ["python", "src/memote_webservice/worker.py"]
+        command: ["celery", "-A", "memote_webservice.tasks", "worker", "--loglevel=info"]
         resources:
           requests:
             cpu: "10m"

@@ -43,13 +43,6 @@ class Default:
         self.BUNDLE_ERRORS = True
         self.CORS_ORIGINS = os.environ['ALLOWED_ORIGINS'].split(',')
         self.REDIS_URL = os.environ['REDIS_URL']
-        self.QUEUES = ['default']
-        # Time after which a running job will be interrupted.
-        self.QUEUE_TIMEOUT = [1800]  # 30 min
-        # Time after which an enqueued job will be removed.
-        self.JOB_TTL = [86400]  # 1 day
-        # Time after which a successful result will be removed.
-        self.RESULT_TTL = [604800]  # 7 days
         self.SENTRY_DSN = os.environ.get('SENTRY_DSN')
         self.SENTRY_CONFIG = {
             'ignore_exceptions': [

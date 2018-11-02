@@ -20,15 +20,14 @@ from gzip import GzipFile
 from io import BytesIO
 from itertools import chain
 
-import redis
 import structlog
 from cobra.io import load_json_model, read_sbml_model
 from cobra.io.sbml3 import CobraSBMLError
 from flask_restplus import Resource
-from rq import Connection, Queue
 from werkzeug.datastructures import FileStorage
 
-from memote_webservice.app import api, app
+from memote_webservice.app import api
+from memote_webservice.tasks import model_snapshot
 
 
 __all__ = ("Submit",)
@@ -66,17 +65,9 @@ class Submit(Resource):
         return {"uuid": job_id}, 202
 
     def _submit(self, model):
-        LOGGER.debug("Create connection to '%s'.", app.config["REDIS_URL"])
-        with Connection(redis.from_url(app.config["REDIS_URL"])):
-            LOGGER.debug("Using queue '%s'.", app.config["QUEUES"][0])
-            queue = Queue(app.config["QUEUES"][0],
-                          default_timeout=app.config["QUEUE_TIMEOUT"][0])
-            job = queue.enqueue(
-                "jobs.model_snapshot", args=(model,),
-                ttl=app.config["JOB_TTL"][0],
-                result_ttl=app.config["RESULT_TTL"][0])
-            LOGGER.debug(f"Successfully submitted job '{job.get_id()}'.")
-        return job.get_id()
+        result = model_snapshot.delay(model)
+        LOGGER.debug(f"Successfully submitted job '{result.id}'.")
+        return result.id
 
     def _load_model(self, file_storage):
         try:
