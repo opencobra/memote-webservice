@@ -30,16 +30,16 @@ services:
       default:
   worker:
     user: kaa
-    build:
-      context: worker/
-      dockerfile: Dockerfile
+    image: opencobra/memote-webservice:${IMAGE_TAG:-latest}
     networks:
       default:
+    volumes:
+      - ".:/home/kaa/app"
     environment:
       - REDIS_URL=redis://cache:6379/0
     depends_on:
       - cache
-    command: python worker.py
+    command: python src/memote_webservice/worker.py
   dashboard:
     build:
       context: dashboard/

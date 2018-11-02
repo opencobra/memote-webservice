@@ -11,5 +11,5 @@ webargs
 werkzeug
 rq
 rq-dashboard
-cobra<0.13.0
+cobra
 memote
