@@ -1,4 +1,4 @@
-.PHONY: setup network lock build start qa style test test-travis flake8 isort \
+.PHONY: setup network build safety start qa style test test-travis flake8 isort \
 		isort-save license stop clean logs
 SHELL:=/bin/bash
 
@@ -14,10 +14,6 @@ network:
 	docker network inspect opencobra >/dev/null 2>&1 || \
 		docker network create opencobra
 
-## Generate Pipfile.lock.
-lock:
-	docker-compose run --rm web pipenv lock
-
 ## Build local docker images.
 build:
 	docker-compose build
@@ -27,7 +23,7 @@ start:
 	docker-compose up --force-recreate -d
 
 ## Run all QA targets.
-qa: test pipenv-check style
+qa: test style
 
 ## Run all style related targets.
 style: flake8 isort license
@@ -47,8 +43,8 @@ test-travis:
 	bash <(curl -s https://codecov.io/bash) -f "$(shared)/coverage.xml"
 
 ## Check for known vulnerabilities in python dependencies.
-pipenv-check:
-	docker-compose run --rm web pipenv check --system
+safety:
+	docker-compose run --rm web safety check
 
 ## Run flake8.
 flake8:
