@@ -22,7 +22,6 @@ import os
 import structlog
 from flask import Flask
 from flask_cors import CORS
-from flask_redis import FlaskRedis
 from flask_restplus import Api
 from pythonjsonlogger import jsonlogger
 from raven.contrib.flask import Sentry
@@ -37,7 +36,6 @@ api = Api(
     version="0.1.0",
     description="Provide a REST API for testing metabolic models with memote."
 )
-redis_store = FlaskRedis()
 
 
 def init_app(application, interface):
@@ -89,9 +87,6 @@ def init_app(application, interface):
 
     # Add CORS information for all resources.
     CORS(application)
-
-    # Add Redis caching.
-    redis_store.init_app(application)
 
     # Please keep in mind that it is a security issue to use such a middleware
     # in a non-proxy setup because it will blindly trust the incoming headers

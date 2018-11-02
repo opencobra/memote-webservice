@@ -1,7 +1,6 @@
 Flask
 Flask-Cors
 flask-restplus
-flask-redis
 gunicorn
 gevent
 raven[flask]
