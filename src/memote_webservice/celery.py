@@ -26,6 +26,7 @@ celery_app = Celery(
 )
 
 celery_app.conf.update(
+    task_track_started=True,
     # Time after which a running job will be interrupted.
     task_time_limit=1800,  # 30 min
     # Time after which a successful result will be removed.
