@@ -51,7 +51,6 @@ def output_html(report, code, headers=None):
 @api.doc(params={"uuid": "A unique result identifier."}, responses={
     200: "Success",
     400: "Bad request",
-    404: "Result not found"
 })
 class Report(Resource):
     """Provide endpoints for metabolic model testing."""
@@ -64,10 +63,6 @@ class Report(Resource):
     def get(self, uuid):
         """Return a snapshot report as JSON or HTML based on Accept headers."""
         result = AsyncResult(id=uuid, app=celery_app)
-        if result.state == 'PENDING':
-            msg = f"Result {uuid} does not exist."
-            LOGGER.info(msg)
-            api.abort(404, msg)
         if result.ready():
             # Extract the SnapshotReport object's result attribute.
             report = result.get()

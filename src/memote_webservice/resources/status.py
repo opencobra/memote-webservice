@@ -39,10 +39,6 @@ class Status(Resource):
     def get(self, uuid):
         """Return queue information about a task."""
         result = AsyncResult(id=uuid, app=celery_app)
-        if result.state == 'PENDING':
-            msg = f"Result {uuid} does not exist."
-            LOGGER.info(msg)
-            api.abort(404, msg)
         return {
             "finished": result.ready(),
             "status": result.state,
