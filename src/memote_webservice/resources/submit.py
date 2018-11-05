@@ -23,6 +23,7 @@ from itertools import chain
 import structlog
 from cobra.io import load_json_model, read_sbml_model
 from cobra.io.sbml3 import CobraSBMLError
+from flask import jsonify
 from flask_restplus import Resource
 from werkzeug.datastructures import FileStorage
 
@@ -59,10 +60,15 @@ class Submit(Resource):
     })
     def post(self):
         """Load a metabolic model and submit it for testing by memote."""
-        upload = self.upload_parser.parse_args(strict=True)["model"]
-        model = self._load_model(upload)
-        job_id = self._submit(model)
-        return {"uuid": job_id}, 202
+        try:
+            upload = self.upload_parser.parse_args(strict=True)["model"]
+            model = self._load_model(upload)
+            job_id = self._submit(model)
+            return {"uuid": job_id}, 202
+        except Exception as e:
+            message = (f"Cobrapy can not load the provided model: "
+                       f"{type(e).__name__}: {str(e)}")
+            api.abort(400, message)
 
     def _submit(self, model):
         result = model_snapshot.delay(model)
