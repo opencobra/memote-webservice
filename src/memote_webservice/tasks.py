@@ -22,6 +22,7 @@ from .celery import celery_app
 
 @celery_app.task
 def model_snapshot(model):
+    """Run memote on the given model and create a snapshot report."""
     _, result = memote.test_model(model, results=True,
                                   pytest_args=["--tb", "no"])
     config = memote.ReportConfiguration.load()
