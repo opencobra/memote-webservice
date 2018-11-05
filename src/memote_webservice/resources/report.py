@@ -17,7 +17,7 @@
 
 from celery.result import AsyncResult
 import structlog
-from flask import make_response
+from flask import jsonify, make_response
 from flask_restplus import Resource
 
 from memote_webservice.app import api, app
@@ -65,7 +65,14 @@ class Report(Resource):
         result = AsyncResult(id=uuid, app=celery_app)
         if result.ready():
             # Extract the SnapshotReport object's result attribute.
-            report = result.get()
+            try:
+                report = result.get()
+            except Exception as e:
+                return jsonify({
+                    'status': result.state,
+                    'exception': type(e).__name__,
+                    'message': str(e),
+                })
         else:
             msg = f"Result {uuid} is not yet finished."
             LOGGER.info(msg)
