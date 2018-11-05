@@ -15,12 +15,12 @@
 
 """Provide a resource for retrieving test results."""
 
-from celery.result import AsyncResult
 import structlog
+from celery.result import AsyncResult
 from flask import jsonify, make_response
 from flask_restplus import Resource
 
-from memote_webservice.app import api, app
+from memote_webservice.app import api
 from memote_webservice.celery import celery_app
 
 
