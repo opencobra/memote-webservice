@@ -20,3 +20,26 @@ spec:
         backend:
           serviceName: memote-webservice-production
           servicePort: 80
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: memote-webservice-production-flower
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+  - hosts:
+    - flower.dd-decaf.eu
+    secretName: decaf-tls
+  rules:
+  - host: flower.dd-decaf.eu
+    http:
+      paths:
+      - path: /memote
+        backend:
+          serviceName: memote-webservice-production
+          servicePort: 5555

@@ -64,6 +64,20 @@ spec:
             cpu: "10m"
           limits:
             cpu: "1000m"
+      - name: flower
+        image: gcr.io/dd-decaf-cfbf6/memote-webservice:master
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5555
+        env:
+        - name: REDIS_URL
+          value: redis://localhost:6379/0
+        command: ["celery", "flower", "-A", "memote_webservice", "--broker=redis://localhost:6379/0", "--url_prefix=/memote"]
+        resources:
+          requests:
+            cpu: "50m"
+          limits:
+            cpu: "100m"
       - name: cache
         image: redis:4.0-alpine
         resources:
