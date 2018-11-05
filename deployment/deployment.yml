@@ -52,6 +52,9 @@ spec:
       - name: worker
         image: gcr.io/dd-decaf-cfbf6/memote-webservice:master
         imagePullPolicy: Always
+        securityContext:
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
         env:
         - name: REDIS_URL
           value: redis://localhost:6379/0
