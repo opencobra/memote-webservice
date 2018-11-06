@@ -23,7 +23,6 @@ from itertools import chain
 import structlog
 from cobra.io import load_json_model, read_sbml_model
 from cobra.io.sbml3 import CobraSBMLError
-from flask import jsonify
 from flask_restplus import Resource
 from werkzeug.datastructures import FileStorage
 
