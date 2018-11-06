@@ -85,3 +85,10 @@ spec:
             cpu: "10m"
           limits:
             cpu: "100m"
+        volumeMounts:
+          - mountPath: "/data"
+            name: memote-webservice-production
+      volumes:
+        - name: memote-webservice-production
+          persistentVolumeClaim:
+           claimName: memote-webservice-production
