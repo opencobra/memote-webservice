@@ -41,20 +41,20 @@ services:
     depends_on:
       - cache
     command: celery -A memote_webservice.tasks worker --loglevel=info
-  dashboard:
-    build:
-      context: dashboard/
-      dockerfile: Dockerfile
-    image: rq-dashboard
-    environment:
-      - FLASK_DEBUG=1
-    ports:
-      - "${DASHBOARD_PORT:-9181}:9181"
-    networks:
-      default:
+  flower:
+    image: opencobra/memote-webservice:${IMAGE_TAG:-latest}
     depends_on:
       - cache
-    command: rq-dashboard --redis-host cache
+    networks:
+      default:
+    ports:
+      - "${FLOWER_PORT:-5555}:5555"
+    volumes:
+      - ".:/app"
+    environment:
+      - REDIS_URL=redis://cache:6379/0
+    command: celery flower -A memote_webservice --broker=redis://cache:6379/0
+
 
 # Additional services that the `web` service `depends_on` should usually only
 # be on the default network and not exposed on the general network, i.e.,
