@@ -63,18 +63,16 @@ class Report(Resource):
     def get(self, uuid):
         """Return a snapshot report as JSON or HTML based on Accept headers."""
         result = AsyncResult(id=uuid, app=celery_app)
-        if result.ready():
-            # Extract the SnapshotReport object's result attribute.
-            try:
-                report = result.get()
-            except Exception as e:
-                return jsonify({
-                    'status': result.state,
-                    'exception': type(e).__name__,
-                    'message': str(e),
-                })
-        else:
+        if not result.ready():
             msg = f"Result {uuid} is not yet finished."
             LOGGER.info(msg)
             api.abort(400, msg)
-        return report
+        elif result.failed():
+            exception = result.get(propagate=False)
+            return jsonify({
+                'status': result.state,
+                'exception': type(exception).__name__,
+                'message': str(exception),
+            })
+        else:
+            return result.get()
