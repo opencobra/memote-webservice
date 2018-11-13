@@ -33,7 +33,6 @@ class Status(MethodResource):
 
     @doc(description="Return queue information about a task.")
     @marshal_with(StatusResponse, code=200)
-    @marshal_with(None, code=404)
     def get(self, uuid):
         result = AsyncResult(id=uuid, app=celery_app)
         return {

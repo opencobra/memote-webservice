@@ -17,7 +17,7 @@
 
 import structlog
 from celery.result import AsyncResult
-from flask import abort, jsonify, make_response, request
+from flask import jsonify, make_response, render_template, request
 from flask_apispec import MethodResource, doc, marshal_with
 
 from memote_webservice.celery import celery_app
@@ -34,13 +34,12 @@ class Report(MethodResource):
     @doc(description="Return a snapshot report as JSON or HTML based on Accept "
                      "headers.")
     @marshal_with(None, code=200)
-    @marshal_with(None, code=400)
+    @marshal_with(None, code=404)
     def get(self, uuid):
         result = AsyncResult(id=uuid, app=celery_app)
         if not result.ready():
-            msg = f"Result {uuid} is not yet finished."
-            LOGGER.info(msg)
-            abort(400, msg)
+            LOGGER.info(f"Result {uuid} is pending; assuming it is expired.")
+            return make_response(render_template('404.html'), 404)
         elif result.failed():
             exception = result.get(propagate=False)
             return jsonify({
