@@ -13,23 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provide session level fixtures."""
-
-import pytest
-
-from memote_webservice.app import app as app_
-from memote_webservice.app import init_app
+from marshmallow import Schema, fields
 
 
-@pytest.fixture(scope="session")
-def app():
-    """Provide an initialized Flask for use in certain test cases."""
-    init_app(app_)
-    return app_
+class SubmitRequest(Schema):
+    model = fields.Field(description="Metabolic model file", required=True)
+
+    class Meta:
+        strict = True
 
 
-@pytest.fixture(scope="session")
-def client(app):
-    """Provide a Flask test client to be used by almost all test cases."""
-    with app.test_client() as client:
-        yield client
+class SubmitResponse(Schema):
+    uuid = fields.String()
+
+
+class StatusResponse(Schema):
+    finished = fields.String()
+    status = fields.String()

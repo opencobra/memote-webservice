@@ -35,7 +35,8 @@ class Default:
         ``os.environ.__getitem__``.
         """
         self.DEBUG = True
-        self.SWAGGER_UI_DOC_EXPANSION = 'list'
+        self.APISPEC_TITLE = "Memote Webservice"
+        self.APISPEC_SWAGGER_UI_URL = "/"
         # 25 MB default limit (size of Recon3D).
         self.MAX_CONTENT_LENGTH = int(os.environ.get(
             "MAX_CONTENT_LENGTH", 25 * 1024 * 1024))

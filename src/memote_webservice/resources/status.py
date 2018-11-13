@@ -17,10 +17,10 @@
 
 import structlog
 from celery.result import AsyncResult
-from flask_restplus import Resource
+from flask_apispec import MethodResource, doc, marshal_with
 
-from memote_webservice.app import api
 from memote_webservice.celery import celery_app
+from memote_webservice.schemas import StatusResponse
 
 
 __all__ = ("Status",)
@@ -28,16 +28,13 @@ __all__ = ("Status",)
 LOGGER = structlog.get_logger(__name__)
 
 
-@api.route("/status/<string:uuid>")
-@api.doc(params={"uuid": "A unique result identifier."}, responses={
-    200: "Success",
-    404: "Result not found"
-})
-class Status(Resource):
+class Status(MethodResource):
     """Query the queue for a particular result status."""
 
+    @doc(description="Return queue information about a task.")
+    @marshal_with(StatusResponse, code=200)
+    @marshal_with(None, code=404)
     def get(self, uuid):
-        """Return queue information about a task."""
         result = AsyncResult(id=uuid, app=celery_app)
         return {
             "finished": result.ready(),

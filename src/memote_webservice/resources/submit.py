@@ -23,10 +23,10 @@ from itertools import chain
 import structlog
 from cobra.io import load_json_model, read_sbml_model
 from cobra.io.sbml3 import CobraSBMLError
-from flask_restplus import Resource
-from werkzeug.datastructures import FileStorage
+from flask import abort
+from flask_apispec import MethodResource, doc, marshal_with, use_kwargs
 
-from memote_webservice.app import api
+from memote_webservice.schemas import SubmitRequest, SubmitResponse
 from memote_webservice.tasks import model_snapshot
 
 
@@ -35,8 +35,7 @@ __all__ = ("Submit",)
 LOGGER = structlog.get_logger(__name__)
 
 
-@api.route("/submit")
-class Submit(Resource):
+class Submit(MethodResource):
     """Submit a metabolic model for testing."""
 
     JSON_TYPES = {
@@ -47,27 +46,22 @@ class Submit(Resource):
         "application/xml",
         "text/xml"
     }
-    upload_parser = api.parser()
-    upload_parser.add_argument(
-        "model", location="files", type=FileStorage, required=True,
-        nullable=False, help="No model file was submitted in field 'model'.")
 
-    @api.doc(parser=upload_parser, responses={
-                 202: "Success",
-                 400: "Bad Request",
-                 415: "Bad media type"
-    })
-    def post(self):
-        """Load a metabolic model and submit it for testing by memote."""
+    @doc(description="Load a metabolic model and submit it for testing by "
+                     "memote.")
+    @use_kwargs(SubmitRequest, locations=('files',))
+    @marshal_with(SubmitResponse, code=202)
+    @marshal_with(None, code=400)
+    @marshal_with(None, code=415)
+    def post(self, model):
         try:
-            upload = self.upload_parser.parse_args(strict=True)["model"]
-            model = self._load_model(upload)
+            model = self._load_model(model)
             job_id = self._submit(model)
             return {"uuid": job_id}, 202
         except Exception as e:
             message = (f"Cobrapy can not load the provided model: "
                        f"{type(e).__name__}: {str(e)}")
-            api.abort(400, message)
+            abort(400, message)
 
     def _submit(self, model):
         result = model_snapshot.delay(model)
@@ -81,7 +75,7 @@ class Submit(Resource):
         except IOError as err:
             msg = "Failed to decompress file."
             LOGGER.exception(msg)
-            api.abort(400, msg, error=str(err))
+            abort(400, msg, error=str(err))
         try:
             if file_storage.mimetype in self.JSON_TYPES or \
                     filename.endswith("json"):
@@ -94,12 +88,12 @@ class Submit(Resource):
             else:
                 msg = f"'{file_storage.mimetype}' is an unhandled MIME type."
                 LOGGER.error(msg)
-                api.abort(415, msg, recognizedMIMETypes=list(chain(
+                abort(415, msg, recognizedMIMETypes=list(chain(
                     self.JSON_TYPES, self.XML_TYPES)))
         except (CobraSBMLError, ValueError) as err:
             msg = "Failed to parse model."
             LOGGER.exception(msg)
-            api.abort(400, msg, error=str(err))
+            abort(400, msg, error=str(err))
         finally:
             content.close()
             file_storage.close()

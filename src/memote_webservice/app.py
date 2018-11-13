@@ -20,25 +20,20 @@ import logging.config
 import os
 
 import structlog
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
-from flask_restplus import Api
 from pythonjsonlogger import jsonlogger
 from raven.contrib.flask import Sentry
 from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.exceptions import HTTPException
 
 
 LOGGER = structlog.get_logger(__name__)
 
 app = Flask(__name__)
-api = Api(
-    title="Memote Webservice",
-    version="0.1.0",
-    description="Provide a REST API for testing metabolic models with memote."
-)
 
 
-def init_app(application, interface):
+def init_app(application):
     """Initialize the main app with config information and routes."""
     if os.environ["ENVIRONMENT"] == "production":
         from memote_webservice.settings import Production
@@ -80,13 +75,28 @@ def init_app(application, interface):
                         level=logging.ERROR)
         sentry.init_app(application)
 
-    # Import resources.
-    import memote_webservice.resources  # noqa: F401
-
-    interface.init_app(application)
+    # Add routes and resources.
+    from memote_webservice import resources
+    resources.init_app(application)
 
     # Add CORS information for all resources.
     CORS(application)
+
+    # Add an error handler for webargs parser error, ensuring a JSON response
+    # including all error messages produced from the parser.
+    @application.errorhandler(422)
+    def handle_webargs_error(error):
+        response = jsonify(error.data['messages'])
+        response.status_code = error.code
+        return response
+
+    # Handle werkzeug HTTPExceptions (typically raised through `flask.abort`) by
+    # returning a JSON response including the error description.
+    @application.errorhandler(HTTPException)
+    def handle_error(error):
+        response = jsonify({'message': error.description})
+        response.status_code = error.code
+        return response
 
     # Please keep in mind that it is a security issue to use such a middleware
     # in a non-proxy setup because it will blindly trust the incoming headers
