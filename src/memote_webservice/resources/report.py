@@ -17,7 +17,7 @@
 
 import structlog
 from celery.result import AsyncResult
-from flask import abort, jsonify, make_response
+from flask import abort, jsonify, make_response, request
 from flask_apispec import MethodResource, doc, marshal_with
 
 from memote_webservice.celery import celery_app
@@ -28,31 +28,8 @@ __all__ = ("Report",)
 LOGGER = structlog.get_logger(__name__)
 
 
-def output_json(report, code, headers=None):
-    """Convert a memote report to JSON."""
-    LOGGER.debug("Converting to JSON.")
-    resp = make_response(report.render_json(), code)
-    if headers is not None:
-        resp.headers.extend(headers)
-    return resp
-
-
-def output_html(report, code, headers=None):
-    """Convert a memote report to HTML."""
-    LOGGER.debug("Converting to HTML.")
-    resp = make_response(report.render_html(), code)
-    if headers is not None:
-        resp.headers.extend(headers)
-    return resp
-
-
 class Report(MethodResource):
     """Provide endpoints for metabolic model testing."""
-
-    representations = {
-        "application/json": output_json,
-        "text/html": output_html
-    }
 
     @doc(description="Return a snapshot report as JSON or HTML based on Accept "
                      "headers.")
@@ -72,4 +49,14 @@ class Report(MethodResource):
                 'message': str(exception),
             })
         else:
-            return result.get()
+            report = result.get()
+            mime_type = request.accept_mimetypes.best_match([
+                'text/html',
+                'application/json',
+            ])
+            if mime_type == 'text/html':
+                LOGGER.debug("Rendering HTML report based on mime type.")
+                return make_response(report.render_html())
+            else:
+                LOGGER.debug("Rendering JSON report based on mime type.")
+                return make_response(report.render_json())
