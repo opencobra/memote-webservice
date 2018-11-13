@@ -86,10 +86,13 @@ class Submit(MethodResource):
                 LOGGER.debug("Loading model from SBML.")
                 model = read_sbml_model(content)
             else:
-                msg = f"'{file_storage.mimetype}' is an unhandled MIME type."
+                mime_types = ', '.join((chain(self.JSON_TYPES, self.XML_TYPES)))
+                msg = (
+                    f"'{file_storage.mimetype}' is an unhandled MIME type. "
+                    f"Recognized MIME types are: {mime_types}"
+                )
                 LOGGER.error(msg)
-                abort(415, msg, recognizedMIMETypes=list(chain(
-                    self.JSON_TYPES, self.XML_TYPES)))
+                abort(415, msg)
         except (CobraSBMLError, ValueError) as err:
             msg = "Failed to parse model."
             LOGGER.exception(msg)
