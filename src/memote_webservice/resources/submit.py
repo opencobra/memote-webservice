@@ -59,9 +59,7 @@ class Submit(MethodResource):
             job_id = self._submit(model)
             return {"uuid": job_id}, 202
         except Exception as e:
-            message = (f"Cobrapy can not load the provided model: "
-                       f"{type(e).__name__}: {str(e)}")
-            abort(400, message)
+            abort(400, f"{type(e).__name__}: {str(e)}")
 
     def _submit(self, model):
         result = model_snapshot.delay(model)
