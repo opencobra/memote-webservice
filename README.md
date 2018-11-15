@@ -1,14 +1,8 @@
 # memote Webservice
 
-![master Branch](https://img.shields.io/badge/branch-master-blue.svg)
-[![master Build Status](https://travis-ci.org/DD-DeCaF/memote-webservice.svg?branch=master)](https://travis-ci.org/DD-DeCaF/memote-webservice)
-[![master Codecov](https://codecov.io/gh/DD-DeCaF/memote-webservice/branch/master/graph/badge.svg)](https://codecov.io/gh/DD-DeCaF/memote-webservice/branch/master)
-[![master Requirements Status](https://requires.io/github/DD-DeCaF/memote-webservice/requirements.svg?branch=master)](https://requires.io/github/DD-DeCaF/memote-webservice/requirements/?branch=master)
-
-![devel Branch](https://img.shields.io/badge/branch-devel-blue.svg)
-[![devel Build Status](https://travis-ci.org/DD-DeCaF/memote-webservice.svg?branch=devel)](https://travis-ci.org/DD-DeCaF/memote-webservice)
-[![devel Codecov](https://codecov.io/gh/DD-DeCaF/memote-webservice/branch/devel/graph/badge.svg)](https://codecov.io/gh/DD-DeCaF/memote-webservice/branch/devel)
-[![devel Requirements Status](https://requires.io/github/DD-DeCaF/memote-webservice/requirements.svg?branch=devel)](https://requires.io/github/DD-DeCaF/memote-webservice/requirements/?branch=devel)
+[![Build Status](https://travis-ci.org/DD-DeCaF/memote-webservice.svg?branch=master)](https://travis-ci.org/DD-DeCaF/memote-webservice)
+[![Codecov](https://codecov.io/gh/DD-DeCaF/memote-webservice/branch/master/graph/badge.svg)](https://codecov.io/gh/DD-DeCaF/memote-webservice/branch/master)
+[![Requirements Status](https://requires.io/github/DD-DeCaF/memote-webservice/requirements.svg?branch=master)](https://requires.io/github/DD-DeCaF/memote-webservice/requirements/?branch=master)
 
 ## Development
 
