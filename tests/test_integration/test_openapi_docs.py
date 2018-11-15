@@ -29,7 +29,7 @@ def test_swagger_docs(client):
 
 def test_swagger_json(client):
     """Expect the OpenAPI docs to be served as JSON."""
-    endpoint = urljoin(os.environ["SCRIPT_NAME"], "/swagger.json")
+    endpoint = urljoin(os.environ["SCRIPT_NAME"], "/swagger/")
     resp = client.get(endpoint)
     assert resp.status_code == 200
     assert resp.content_type == "application/json"
