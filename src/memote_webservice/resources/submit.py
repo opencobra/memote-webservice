@@ -89,7 +89,7 @@ class Submit(MethodResource):
                     f"'{file_storage.mimetype}' is an unhandled MIME type. "
                     f"Recognized MIME types are: {mime_types}"
                 )
-                LOGGER.error(msg)
+                LOGGER.warning(msg)
                 abort(415, msg)
         except (CobraSBMLError, ValueError) as err:
             msg = "Failed to parse model."
