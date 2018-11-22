@@ -48,7 +48,7 @@ spec:
           requests:
             cpu: "100m"
           limits:
-            cpu: "500m"
+            cpu: "2000m"
       - name: worker
         image: gcr.io/dd-decaf-cfbf6/memote-webservice:master
         imagePullPolicy: Always
@@ -61,9 +61,9 @@ spec:
         command: ["celery", "-A", "memote_webservice.tasks", "worker", "--loglevel=info"]
         resources:
           requests:
-            cpu: "500m"
-          limits:
             cpu: "1000m"
+          limits:
+            cpu: "6000m"
       - name: flower
         image: gcr.io/dd-decaf-cfbf6/memote-webservice:master
         imagePullPolicy: Always
@@ -75,16 +75,16 @@ spec:
         command: ["celery", "flower", "-A", "memote_webservice", "--broker=redis://localhost:6379/0", "--url_prefix=/memote"]
         resources:
           requests:
-            cpu: "50m"
-          limits:
             cpu: "100m"
+          limits:
+            cpu: "2000m"
       - name: cache
         image: redis:4.0-alpine
         resources:
           requests:
-            cpu: "200m"
+            cpu: "100m"
           limits:
-            cpu: "500m"
+            cpu: "2000m"
         volumeMounts:
           - mountPath: "/data"
             name: memote-webservice-production
