@@ -72,7 +72,17 @@ spec:
         env:
         - name: REDIS_URL
           value: redis://localhost:6379/0
-        command: ["celery", "flower", "-A", "memote_webservice", "--broker=redis://localhost:6379/0", "--url_prefix=/memote"]
+        - name: FLOWER_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: memote-webservice
+              key: FLOWER_USERNAME
+        - name: FLOWER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: memote-webservice
+              key: FLOWER_PASSWORD
+        command: ["celery", "flower", "-A", "memote_webservice", "--broker=redis://localhost:6379/0", "--url_prefix=/memote", "--basic_auth=$(FLOWER_USERNAME):$(FLOWER_PASSWORD)"]
         resources:
           requests:
             cpu: "100m"
