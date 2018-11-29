@@ -71,9 +71,9 @@ class Submit(MethodResource):
             filename, content = self._decompress(file_storage.filename.lower(),
                                                  file_storage)
         except IOError as err:
-            msg = "Failed to decompress file."
+            msg = f"Failed to decompress file: {str(err)}"
             LOGGER.exception(msg)
-            abort(400, msg, error=str(err))
+            abort(400, msg)
         try:
             if file_storage.mimetype in self.JSON_TYPES or \
                     filename.endswith("json"):
@@ -92,9 +92,9 @@ class Submit(MethodResource):
                 LOGGER.warning(msg)
                 abort(415, msg)
         except (CobraSBMLError, ValueError) as err:
-            msg = "Failed to parse model."
+            msg = f"Failed to parse model: {str(err)}"
             LOGGER.exception(msg)
-            abort(400, msg, error=str(err))
+            abort(400, msg)
         finally:
             content.close()
             file_storage.close()
