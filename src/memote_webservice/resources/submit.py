@@ -54,12 +54,9 @@ class Submit(MethodResource):
     @marshal_with(None, code=400)
     @marshal_with(None, code=415)
     def post(self, model):
-        try:
-            model = self._load_model(model)
-            job_id = self._submit(model)
-            return {"uuid": job_id}, 202
-        except Exception as e:
-            abort(400, f"{type(e).__name__}: {str(e)}")
+        model = self._load_model(model)
+        job_id = self._submit(model)
+        return {"uuid": job_id}, 202
 
     def _submit(self, model):
         result = model_snapshot.delay(model)
