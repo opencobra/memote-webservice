@@ -91,7 +91,13 @@ class Submit(MethodResource):
         except (CobraSBMLError, ValueError) as err:
             msg = f"Failed to parse model: {str(err)}"
             LOGGER.exception(msg)
+            LOGGER.debug(f"Submitted model: {content.getvalue()}")
             abort(400, msg)
+        except Exception:
+            # Unexpected exception. Don't handle it here, but do dump the
+            # submitted model for debugging before re-raising.
+            LOGGER.debug(f"Submitted model: {content.getvalue()}")
+            raise
         finally:
             content.close()
             file_storage.close()
