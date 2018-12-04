@@ -19,6 +19,7 @@ from bz2 import BZ2File
 from gzip import GzipFile
 from io import BytesIO
 from itertools import chain
+from uuid import uuid4
 
 import structlog
 from cobra.io import load_json_model, read_sbml_model
@@ -91,12 +92,12 @@ class Submit(MethodResource):
         except (CobraSBMLError, ValueError) as err:
             msg = f"Failed to parse model: {str(err)}"
             LOGGER.exception(msg)
-            LOGGER.debug(f"Submitted model: {content.getvalue()}")
+            self._dump_model(file_storage.filename, content)
             abort(400, msg)
         except Exception:
             # Unexpected exception. Don't handle it here, but do dump the
             # submitted model for debugging before re-raising.
-            LOGGER.debug(f"Submitted model: {content.getvalue()}")
+            self._dump_model(file_storage.filename, content)
             raise
         finally:
             content.close()
@@ -118,3 +119,10 @@ class Submit(MethodResource):
         else:
             content = BytesIO(content.read())
         return filename, content
+
+    @staticmethod
+    def _dump_model(filename, content):
+        uuid = str(uuid4())
+        LOGGER.warning(f"Dumping uploaded model '{filename}' to file '{uuid}'")
+        with open(uuid, 'wb') as f:
+            f.write(content.getvalue())
