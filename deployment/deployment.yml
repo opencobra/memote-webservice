@@ -58,6 +58,9 @@ spec:
         env:
         - name: REDIS_URL
           value: redis://localhost:6379/0
+        # Disabling sympy cache prevents significant memory leaks in the cobrapy stack
+        - name: SYMPY_USE_CACHE
+          value: "no"
         command: ["celery", "-A", "memote_webservice.tasks", "worker", "--loglevel=info"]
         resources:
           requests:
