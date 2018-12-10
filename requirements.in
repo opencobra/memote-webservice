@@ -14,6 +14,4 @@ celery[redis]
 redis<3.0.0
 flower
 cobra
-# Memote 0.8.7 has a dependency issue with equilibrator-api, and tests don't run.
-# Keep this pin until the issue has been sorted out.
-memote==0.8.6
+memote
