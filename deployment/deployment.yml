@@ -46,9 +46,10 @@ spec:
         command: ["gunicorn", "-c", "gunicorn.py", "memote_webservice.wsgi:app"]
         resources:
           requests:
-            cpu: "100m"
+            cpu: "10m"
           limits:
             cpu: "2000m"
+            memory: "1Gi"
       - name: worker
         image: gcr.io/dd-decaf-cfbf6/memote-webservice:master
         imagePullPolicy: Always
@@ -64,9 +65,10 @@ spec:
         command: ["celery", "-A", "memote_webservice.tasks", "worker", "--loglevel=info"]
         resources:
           requests:
-            cpu: "1000m"
+            cpu: "10m"
           limits:
-            cpu: "6000m"
+            cpu: "4000m"
+            memory: "6Gi"
       - name: flower
         image: gcr.io/dd-decaf-cfbf6/memote-webservice:master
         imagePullPolicy: Always
@@ -88,16 +90,18 @@ spec:
         command: ["celery", "flower", "-A", "memote_webservice", "--broker=redis://localhost:6379/0", "--url_prefix=/memote", "--basic_auth=$(FLOWER_USERNAME):$(FLOWER_PASSWORD)"]
         resources:
           requests:
-            cpu: "100m"
+            cpu: "10m"
           limits:
             cpu: "2000m"
+            memory: "128Mi"
       - name: cache
         image: redis:4.0-alpine
         resources:
           requests:
-            cpu: "100m"
+            cpu: "10m"
           limits:
             cpu: "2000m"
+            memory: "512Mi"
         volumeMounts:
           - mountPath: "/data"
             name: memote-webservice-production
