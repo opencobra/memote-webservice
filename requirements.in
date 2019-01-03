@@ -14,4 +14,4 @@ celery[redis]
 redis<3.0.0
 flower
 cobra
-memote
+memote>0.8.10
