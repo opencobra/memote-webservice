@@ -24,6 +24,6 @@ from .celery import celery_app
 def model_snapshot(model):
     """Run memote on the given model and create a snapshot report."""
     _, result = memote.test_model(model, results=True,
-                                  pytest_args=["--tb", "no"])
+                                  pytest_args=["-vv", "--tb", "long"])
     config = memote.ReportConfiguration.load()
     return memote.SnapshotReport(result=result, configuration=config)
