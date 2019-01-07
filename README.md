@@ -1,5 +1,7 @@
 # Memote Webservice
 
+**N.B.: All relevant development of the web service is happening at https://github.com/DD-DeCaF/memote-webservice. Some deployment details are DD-DeCaF specific but we currently do not have the resources to maintain both. This repository is therefore archived.**
+
 ![master Branch](https://img.shields.io/badge/branch-master-blue.svg)
 [![master Build Status](https://travis-ci.org/opencobra/memote-webservice.svg?branch=master)](https://travis-ci.org/opencobra/memote-webservice)
 [![master Codecov](https://codecov.io/gh/opencobra/memote-webservice/branch/master/graph/badge.svg)](https://codecov.io/gh/opencobra/memote-webservice/branch/master)
